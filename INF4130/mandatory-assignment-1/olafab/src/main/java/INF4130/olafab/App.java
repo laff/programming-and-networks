@@ -7,7 +7,9 @@ package INF4130.olafab;
 public class App {
     public static void main( String[] args ) {
         
-        DynamicSOS exercise1 = new DynamicSOS();
-        exercise1.init();
+        SOS exercise1 = new SOS();
+        
+        // First run dynamic programming.
+        exercise1.init(true);
     }
 }
