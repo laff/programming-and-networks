@@ -1,0 +1,26 @@
+INSTANCE 5 14 1 5 6 3 10
+YES
+ (1,1) (5,1) (6,1) (3,1) (10,1)
+
+0	true	true	true	true	true	true	
+1	false	true	true	true	true	true	
+2	false	false	false	false	false	false	
+3	false	false	false	false	true	true	
+4	false	false	false	false	true	true	
+5	false	false	true	true	true	true	
+6	false	false	true	true	true	true	
+7	false	false	false	true	true	true	
+8	false	false	false	false	true	true	
+9	false	false	false	false	true	true	
+10	false	false	false	false	true	true	
+11	false	false	false	true	true	true	
+12	false	false	false	true	true	true	
+13	false	false	false	false	false	true	
+14	false	false	false	false	true	true	
+INSTANCE 5 4 2 5 6 3 10
+NO
+0	true	true	true	true	true	true	
+1	false	false	false	false	false	false	
+2	false	true	true	true	true	true	
+3	false	false	false	false	true	true	
+4	false	false	false	false	false	false	
