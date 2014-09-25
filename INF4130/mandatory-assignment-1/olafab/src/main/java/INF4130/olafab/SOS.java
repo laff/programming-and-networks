@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Exercise 1 (Dynamic Programming)
@@ -36,7 +37,10 @@ public class SOS {
 	private int[] integers = null;
 	
 	/**
-	 * Initial function that reads from file and sets up objects containing input.
+	 * Initial function that stores choice (DP or recursive function),
+	 * Then calling the function that reads input and further calls method of choice.
+	 * 
+	 * @param choice : true = dynamic programming version, false = recursive.
 	 */
 	public void init(boolean choice) {
 		
@@ -51,72 +55,132 @@ public class SOS {
 	}
 	
 	/**
-	 * Initialize more!
+	 * Managing the dynamic method.
 	 */
-	public void dynamic(int[] integers) {
+	public void dynamic() {
+		try {
+			finalOutput(dynamicAlg());
+		} catch (IOException Ioee) {
+			System.out.println("cant write to file sry");
+		}
+	}
+	
+	/**
+	 * Managing the recursive method.
+	 */
+	public void recursive() {
 		
-		if (isSubsetSum(integers, n, K) == true) {
-			try {
-				finalOutput(true);
-			} catch (IOException Ioee) {
-				System.out.println("cant write to file sry");
-			}
-		} else {
-			try {
-				finalOutput(false);
-			} catch (IOException Ioee) {
-				System.out.println("cant write to file sry");
+		U = new boolean[K][n+1];
+		
+		// Starting out with filling the array with false
+		for (int i = 0; i < K; i++) {
+			for (int j = 0; j <= n; j++) {
+				U[i][j] = false;
 			}
 		}
+
+		try {
+			finalOutput(recursiveAlg(n, K));	
+			
+		} catch (IOException Ioee) {
+			System.out.println("couldnt write to file!");
+		}
+
+		
 	}
 
 	/**
-	 * Function from: http://www.geeksforgeeks.org/dynamic-programming-U-sum-problem/
-	 * Did not manage to figure it out all by my self...
 	 * 
-	 * @param set
+	 * @param num
+	 * @param sum
+	 * @return
+	 */
+	public boolean recursiveAlg(int num, int sum) {
+		
+		// Is the sum zero?
+		// then we won!
+		if (sum == 0) {
+			return true;
+			
+		// sum is not zero, and there is no more numbers left.
+		} else if (num == 0) {
+			return false;
+		}
+		
+		// if num is larger than sum, skip it.
+		if (integers[num-1] > sum) {
+			recursiveAlg(num-1, sum);
+		}
+		
+		
+		// if the first function call returns false, call next function.
+		//
+		// The first call is proceeding to next number while keeping the sum
+		//
+		// second call proceeding to next number, but subtracts current integer.
+		return recursiveAlg(num-1, sum) || recursiveAlg(num-1, (sum - integers[num-1]));
+	}
+	
+	/**
+	 * 
 	 * @param n
 	 * @param sum
 	 * @return
 	 */
-	public boolean isSubsetSum(int set[], int n, int sum) {
+	public boolean dynamicAlg() {
 		
-		int i, j;
+		int i, j, rest;
 		
-		U = new boolean[sum+1][n+1];
-
-		// when n = 0, any sum higher than 1 is invalid.
-		for (i = 1; i <= sum; i++) {
-			U[i][0] = false;
-		}
+		// Creating a boolean array where the first key is to represent the sums
+		//
+		// The second key represents each integer, and the last (n+1) says if the number has been summed successfully.
+		U = new boolean[K][n+1];
 		
-		// when sum = 0, all selections will be valid  - as long as their value is zero.
-		for (j = 0; j <= n; j++) {
-			U[0][j] = true;
-		}
-		
-		// For each sum to be checked
-		for (i = 1; i <= sum; i++) {
-			for (j = 1; j <= n; j++) {
-				
-				
-				// storing last answer (if j = 1, 0 equals false, as of previous declaration).
-				U[i][j] = U[i][j-1];
-			
-				// if increment i, or "sum" is larger or equal than/to the current integer...
-				if (i >= set[j-1]) {
-					
-					// if current answer is false (last answer)
-					if (!U[i][j]) {
-						System.out.println(i + " " + set[j-1] + " " + (j-1) + " " + j);
-						
-						U[i][j] = U[i - set[j-1]][j-1];
-					}
-				}
+		// Starting out with filling the array with false
+		for (i = 0; i < K; i++) {
+			for (j = 0; j <= n; j++) {
+				U[i][j] = false;
 			}
 		}
 		
-		return U[sum][n];
+		// Going through the sums, lowest first.
+		for (i = 0; i < K; i++) {
+			
+			// going through the integers, highest first.
+			for (j = (n - 1); 0 <= j; j--) {
+				
+				
+				// calculate rest.
+				rest = (i + 1) - (integers[j]);
+				
+				// if the current sum equals the current integer then sum i is complete/true.
+				// Proceed to end inner loop by setting j to 0.
+				if (rest == 0) {
+					U[i][j] = true;
+					U[i][n] = true;
+					
+					j = 0;
+				
+				// if the sum is larger than the integer, and there still is integers left to check
+				//
+				//then check if the remainder is complete/true
+				} else if (rest > 0 && j > 0) {
+					
+					// if remainder array is true, set current sum&integer to true
+					if (U[rest - 1][n]) {
+						
+						U[i][j] = true;
+						U[i][n] = true;
+						
+						// copy rest of the remainder sum/integer combo
+						while (j-- > 0) {
+							U[i][j] = U[rest - 1][j];
+						}
+					}	
+				}
+			}
+		}
+		return U[K-1][n];
 	}
 	
 	/**
@@ -127,7 +191,7 @@ public class SOS {
 
         try {
         	if (inputStream == null) {
-        		inputStream = new BufferedReader(new FileReader("inputSOS.txt"));
+        		inputStream = new BufferedReader(new FileReader("input.txt"));
         	}
             
             String l;
@@ -144,10 +208,15 @@ public class SOS {
             		integers[i-2] = Integer.parseInt(data[i]);
             	}
             	
+            	
+            	// Sort the integer array 
+            	Arrays.sort(integers);
+            	
+            	// Proceeding to call either the dynamic or recursive method.
             	if (DP) {
-            		dynamic(integers);
+            		dynamic();
             	} else {
-            		System.out.println("Does not exist yet");
+            		recursive();
             	}
             	
             }
@@ -157,7 +226,7 @@ public class SOS {
                 inputStream.close();
 
             }
-        }		
+        }
 	}
 	
 	/**
@@ -166,11 +235,15 @@ public class SOS {
 	 */
 	public void finalOutput(boolean answer) throws IOException {
 		
+		// Deciding upon what file to save as.
+		// this should be done manually by command line.
+		String output = DP ? "outputDP.txt" : "outputREC.txt";
+		
         try {
         	
         	// Decide upon writing new file or adding to previous.
         	boolean add = (outputStream != null);
-        	outputStream = new PrintWriter(new BufferedWriter(new FileWriter("outputSOS.txt", add)));
+        	outputStream = new PrintWriter(new BufferedWriter(new FileWriter(output, add)));
 
     		outputStream.print("INSTANCE " + n + " " + K);
     		
@@ -179,23 +252,29 @@ public class SOS {
     		}
         	
         	if (answer) {
-                outputStream.print("\r\nYES\r\n");
+                outputStream.print("\r\nYES");
                 
-                /*
                 for (int i = 0; i < n; i++) {
-             
                 	
-                	int bool = (U[K][i]) ? 1 : 0;
+                	int bool = (U[K-1][i]) ? 1 : 0;
                 	
                 	outputStream.print(" (" + integers[i] + "," + bool + ")");
                 }
-                outputStream.print("\r\n\r\n");
-                */
                 
-                for (int i = 0; i <= K; i++) {
+                outputStream.print("\r\n");
+                
+                
+                int h = U.length;                
+                int w = U[0].length;
+                
+                for (int i = 0; i < (w - 1); i++) {
+                	outputStream.print("\t__" + integers[i] + "__");
+                }
+                outputStream.print("\r\n");
+                for (int i = 0; i < h; i++) {
                 	
-                	outputStream.print(i + "\t");
-                	for (int j = 0; j <= n; j++) {
+                	outputStream.print((i+1) + "\t");
+                	for (int j = 0; j < w; j++) {
                 		
                 		outputStream.print(U[i][j] + "\t");
                 		
@@ -207,10 +286,13 @@ public class SOS {
         	} else {
 
         		outputStream.print("\r\nNO\r\n");
-                for (int i = 0; i <= K; i++) {
+        		
+                int h = U.length;                
+                int w = U[0].length;
+                for (int i = 0; i < h; i++) {
                 	
-                	outputStream.print(i + "\t");
-                	for (int j = 0; j <= n; j++) {
+                	outputStream.print((i+1) + "\t");
+                	for (int j = 0; j < w; j++) {
                 		
                 		outputStream.print(U[i][j] + "\t");
                 		
