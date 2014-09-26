@@ -71,16 +71,9 @@ public class SOS {
 	public void recursive() {
 		
 		U = new boolean[K][n+1];
-		
-		// Starting out with filling the array with false
-		for (int i = 0; i < K; i++) {
-			for (int j = 0; j <= n; j++) {
-				U[i][j] = false;
-			}
-		}
 
 		try {
-			finalOutput(recursiveAlg(n, K));	
+			finalOutput(recursiveAlg(K, n-1, n-1));	
 			
 		} catch (IOException Ioee) {
 			System.out.println("couldnt write to file!");
@@ -90,35 +83,77 @@ public class SOS {
 	}
 
 	/**
+	 * This function does not meet the requirements for 1d
 	 * 
 	 * @param num
 	 * @param sum
 	 * @return
 	 */
-	public boolean recursiveAlg(int num, int sum) {
+	public boolean recursiveAlg(int sum, int num, int first) {
 		
-		// Is the sum zero?
-		// then we won!
-		if (sum == 0) {
-			return true;
+		// if the num is.. less than zero and the sum is not found? try again amigo.
+		if (num < 0 && sum != 0) {
+			System.out.println("num is too low, start over with new number??");
+			System.out.println(sum + " " + num + " " + first);
 			
-		// sum is not zero, and there is no more numbers left.
-		} else if (num == 0) {
+			// if "first" already is key 0, return false
+			if (first < 0) {
+				System.out.println("first is too low. quit.");
+				return false;
+			}
+			
+			U[K-1][first] = false;
+			U[K-1][n] = false;
+			return recursiveAlg(K, first-1, first-1);
+		}
+		
+		// if the num is less than zero, and the sum is as it was back in the day.. FUCK IT!
+		if (num < 0 && sum == K) {
+			System.out.println("no hope. num is too low and sum is not changed.");
 			return false;
 		}
 		
-		// if num is larger than sum, skip it.
-		if (integers[num-1] > sum) {
-			recursiveAlg(num-1, sum);
+		// if the cell is true, then mark it as false and go to next number
+		if (U[sum-1][num] == true) {
+			U[sum-1][num] = false;
+			
+			if((num-1 <= 0)) {
+				System.out.println(sum + " " + num + " " + first + " line 121");
+			}
+			
+			return recursiveAlg(sum, num-1, first);
 		}
 		
+		// If the current sum is larger than the current integer
+		// store as used and call function;
+		if (sum > integers[num] && num > 0) {
+			U[sum-1][num] = true;
+			U[K-1][num] = true;
+			
+			if((num-1 <= 0)) {
+				System.out.println(sum + " " + num + " " + first + " line 133");
+			}
+			
+			return recursiveAlg(sum - integers[num], num-1, first);
 		
-		// if the first function call returns false, call next function.
-		//
-		// The first call is proceeding to next number while keeping the sum
-		//
-		// second call proceeding to next number, but subtracts current integer.
-		return recursiveAlg(num-1, sum) || recursiveAlg(num-1, (sum - integers[num-1]));
+		// if the current sum equals the current integer
+		// store integer as used and sum solved.
+		} else if (sum == integers[num]) {
+			U[sum-1][num] = true;
+			U[K-1][num] = true;
+			U[K-1][n] = true;
+			return true;
+		
+		// if the sum is smaller than the integer
+		// proceed to next
+		} else {
+			U[sum-1][num] = false;
+			
+			if((num-1 <= 0)) {
+				System.out.println(sum + " " + num + " " + first + " line 151");
+			}
+			return recursiveAlg(sum, num-1, first);
+		}
 	}
 	
 	/**
