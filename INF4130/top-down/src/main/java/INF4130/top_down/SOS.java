@@ -1,11 +1,11 @@
-package INF4130.olafab;
+package INF4130.top_down;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.BufferedReader;
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
@@ -15,9 +15,6 @@ import java.util.Arrays;
  * 
  */
 public class SOS {
-
-	// boolean that tells the initialInput() to proceed with either dynamic or recursive solution.
-	private boolean DP;
 	
 	// amount of integers to be checked.
 	private int n;
@@ -28,6 +25,8 @@ public class SOS {
 	// Two dimensional boolean array
 	private boolean[][] U;
 
+	private String input, output;
+	
 	// Print stream
 	private PrintWriter outputStream = null;
 	
@@ -42,27 +41,20 @@ public class SOS {
 	 * 
 	 * @param choice : true = dynamic programming version, false = recursive.
 	 */
-	public void init(boolean choice) {
-		
-		DP = choice;
-	
+	public void init() {
 		try {
-			initialInput();
+			input();
 		} catch (IOException Ioe) {
 			System.out.println("did not find file?");
 		}
-		
 	}
 	
-	/**
-	 * Managing the dynamic method.
-	 */
-	public void dynamic() {
-		try {
-			finalOutput(dynamicAlg());
-		} catch (IOException Ioee) {
-			System.out.println("cant write to file sry");
-		}
+	public void setInput(String file) {
+		input = file;
+	}
+	
+	public void setOutput(String file) {
+		output = file;
 	}
 	
 	/**
@@ -73,7 +65,7 @@ public class SOS {
 		U = new boolean[K][n+1];
 
 		try {
-			finalOutput(recursiveAlg(K, n-1, n-1));	
+			output(recursiveAlg(K, n-1, n-1));	
 			
 		} catch (IOException Ioee) {
 			System.out.println("couldnt write to file!");
@@ -141,76 +133,14 @@ public class SOS {
 	}
 	
 	/**
-	 * 
-	 * @param n
-	 * @param sum
-	 * @return
-	 */
-	public boolean dynamicAlg() {
-		
-		int i, j, rest;
-		
-		// Creating a boolean array where the first key is to represent the sums
-		//
-		// The second key represents each integer, and the last (n+1) says if the number has been summed successfully.
-		U = new boolean[K][n+1];
-		
-		// Starting out with filling the array with false
-		for (i = 0; i < K; i++) {
-			for (j = 0; j <= n; j++) {
-				U[i][j] = false;
-			}
-		}
-		
-		// Going through the sums, lowest first.
-		for (i = 0; i < K; i++) {
-			
-			// going through the integers, highest first.
-			for (j = (n - 1); 0 <= j; j--) {
-				
-				
-				// calculate rest.
-				rest = (i + 1) - (integers[j]);
-				
-				// if the current sum equals the current integer then sum i is complete/true.
-				// Proceed to end inner loop by setting j to 0.
-				if (rest == 0) {
-					U[i][j] = true;
-					U[i][n] = true;
-					
-					j = 0;
-				
-				// if the sum is larger than the integer, and there still is integers left to check
-				//
-				//then check if the remainder is complete/true
-				} else if (rest > 0 && j > 0) {
-					
-					// if remainder array is true, set current sum&integer to true
-					if (U[rest - 1][n]) {
-						
-						U[i][j] = true;
-						U[i][n] = true;
-						
-						// copy rest of the remainder sum/integer combo
-						while (j-- > 0) {
-							U[i][j] = U[rest - 1][j];
-						}
-					}	
-				}
-			}
-		}
-		return U[K-1][n];
-	}
-	
-	/**
 	 * Function that reads from file and sets variables.
 	 * @throws IOException
 	 */
-	public void initialInput() throws IOException {
+	public void input() throws IOException {
 
         try {
         	if (inputStream == null) {
-        		inputStream = new BufferedReader(new FileReader("input.txt"));
+        		inputStream = new BufferedReader(new FileReader(input));
         	}
             
             String l;
@@ -231,12 +161,8 @@ public class SOS {
             	// Sort the integer array 
             	Arrays.sort(integers);
             	
-            	// Proceeding to call either the dynamic or recursive method.
-            	if (DP) {
-            		dynamic();
-            	} else {
-            		recursive();
-            	}
+            	// Proceeding to calling the actual functionality that solves this line of "troubles".
+            	recursive();
             	
             }
 
@@ -252,11 +178,7 @@ public class SOS {
 	 * Function that writes to file.
 	 * @throws IOException
 	 */
-	public void finalOutput(boolean answer) throws IOException {
-		
-		// Deciding upon what file to save as.
-		// this should be done manually by command line.
-		String output = DP ? "outputDP.txt" : "outputREC.txt";
+	public void output(boolean answer) throws IOException {
 		
         try {
         	
@@ -281,43 +203,11 @@ public class SOS {
                 }
                 
                 outputStream.print("\r\n");
-                
-                
-                int h = U.length;                
-                int w = U[0].length;
-                
-                for (int i = 0; i < (w - 1); i++) {
-                	outputStream.print("\t__" + integers[i] + "__");
-                }
-                outputStream.print("\r\n");
-                for (int i = 0; i < h; i++) {
-                	
-                	outputStream.print((i+1) + "\t");
-                	for (int j = 0; j < w; j++) {
-                		
-                		outputStream.print(U[i][j] + "\t");
-                		
-                	}
-                	outputStream.print("\r\n");
-                }
-                
 
         	} else {
 
         		outputStream.print("\r\nNO\r\n");
-        		
-                int h = U.length;                
-                int w = U[0].length;
-                for (int i = 0; i < h; i++) {
-                	
-                	outputStream.print((i+1) + "\t");
-                	for (int j = 0; j < w; j++) {
-                		
-                		outputStream.print(U[i][j] + "\t");
-                		
-                	}
-                	outputStream.print("\r\n");
-                }
+        
         	}
 
         } finally {
