@@ -9,10 +9,9 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
- * Exercise 1 (Dynamic Programming)
+ * Class holding all variables and functions necessary to solve the problem "Sum of Selections" with a top-down approach.
  * 
- * b) a standard bottom up dynamic programming algorithm that solves SOS.
- * 
+ * @author Olafab
  */
 public class SOS {
 	
@@ -25,6 +24,7 @@ public class SOS {
 	// Two dimensional boolean array
 	private boolean[][] U;
 
+	// strings describing filename.
 	private String input, output;
 	
 	// Print stream
@@ -33,13 +33,12 @@ public class SOS {
 	// File stream
 	private BufferedReader inputStream = null;
 	
+	// global array containing the integers to select from.
 	private int[] integers = null;
 	
 	/**
-	 * Initial function that stores choice (DP or recursive function),
-	 * Then calling the function that reads input and further calls method of choice.
+	 * Initial function that does nothing but trying to call the input file that reads from file.
 	 * 
-	 * @param choice : true = dynamic programming version, false = recursive.
 	 */
 	public void init() {
 		try {
@@ -59,9 +58,12 @@ public class SOS {
 	
 	/**
 	 * Managing the recursive method.
+	 * 
+	 * Basically connecting the recursive method "recursiveAlg" with the method that prints to file (output).
 	 */
 	public void recursive() {
 		
+		// setting up size of boolean array!
 		U = new boolean[K][n+1];
 
 		try {
@@ -73,42 +75,48 @@ public class SOS {
 	}
 
 	/**
-	 * This function does not meet the requirements for 1d
+	 * Recursive method that finds sum of selection equal to @param sum.
 	 * 
-	 * @param num
-	 * @param sum
+	 * 
+	 * 
+	 * @param num - current key for integers array.
+	 * @param sum - current sum
+	 * @param first - the highest (first) number used in current selection
 	 * @return
 	 */
 	public boolean recursiveAlg(int sum, int num, int first) {
 		
-		// if the num is.. less than zero and the sum is not found? try again amigo.
+		// if the num is.. less than zero and the sum is not found?
 		if (num < 0 && sum != 0) {
+			
 			// if "first" already is key 0, return false
 			if (first < 0) {
-				System.out.println("first is too low. quit.");
 				return false;
 			}
 			
+			// setting "first used" to false as it failed, same with its solution cell.
 			U[K-1][first] = false;
 			U[K-1][n] = false;
+			
+			// trying next integer, but same sum.
 			return recursiveAlg(K, first-1, first-1);
 		}
 		
-		// if the num is less than zero, and the sum is as it was back in the day.. FUCK IT!
+		// if the num is less than zero, and the sum is as it was back in the day.. return false.
 		if (num < 0 && sum == K) {
 			return false;
 		}
 		
-		// if the cell is true, then mark it as false and go to next number
+		// If the cell is true, then mark it as false and go to next number
+		// Why? Because this means that the cell was used previously in some fashion - but failed.
 		if (U[sum-1][num] == true) {
-			
 			U[sum-1][num] = false;
 			
 			return recursiveAlg(sum, num-1, first);
 		}
 		
 		// If the current sum is larger than the current integer
-		// store as used and call function;
+		// store as used and jump to the new sum and integer/Number cell!
 		if (sum > integers[num] && num > 0) {
 			U[sum-1][num] = true;
 			U[K-1][num] = true;

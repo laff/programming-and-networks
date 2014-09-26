@@ -9,10 +9,12 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
- * Exercise 1 (Dynamic Programming)
+ * Sum of Selection class. 
+ * Holds variables and functions used to solve this problem with a bottom-up approach.
  * 
- * b) a standard bottom up dynamic programming algorithm that solves SOS.
+ * Solution to exercise 1b of Mandatory Assignment 1, INF4130, 2014
  * 
+ * @author Olafab
  */
 public class SOS {
 	
@@ -36,10 +38,8 @@ public class SOS {
 	private int[] integers = null;
 	
 	/**
-	 * Initial function that stores choice (DP or recursive function),
-	 * Then calling the function that reads input and further calls method of choice.
-	 * 
-	 * @param choice : true = dynamic programming version, false = recursive.
+	 * Initial function with little to no purpose other than structure while developing.
+	 * Calls input() which reads input though!
 	 */
 	public void init() {
 		try {
@@ -59,6 +59,7 @@ public class SOS {
 	
 	/**
 	 * Managing the dynamic method.
+	 * Also here for structure while developing...
 	 */
 	public void dynamic() {
 		try {
@@ -69,10 +70,11 @@ public class SOS {
 	}
 
 	/**
+	 * The algorithm that solves the problem. 
+	 * Returns the "answer"-cell and its contents upon completion.
 	 * 
-	 * @param n
-	 * @param sum
-	 * @return
+	 * Solution is based on theory explained in class.
+	 * 
 	 */
 	public boolean dynamicAlg() {
 		
@@ -95,7 +97,6 @@ public class SOS {
 			
 			// going through the integers, highest first.
 			for (j = (n - 1); 0 <= j; j--) {
-				
 				
 				// calculate rest.
 				rest = (i + 1) - (integers[j]);
@@ -149,31 +150,33 @@ public class SOS {
             	n = Integer.parseInt(data[0]);
             	K = Integer.parseInt(data[1]);
             	
+            	// setting up array with appropriate size.
             	integers = new int[n];
             	
+            	// Skipping the first two characters of the line.
             	for (int i = 2; i < data.length; i++) {
             		integers[i-2] = Integer.parseInt(data[i]);
             	}
-            	
             	
             	// Sort the integer array 
             	Arrays.sort(integers);
             	
             	// Proceeding to calling the actual functionality that solves this line of "troubles".
             	dynamic();
-            	
             }
-
+            
         } finally {
             if (inputStream != null) {
                 inputStream.close();
-
             }
         }
 	}
 	
 	/**
 	 * Function that writes to file.
+	 * Format as described by assignment details.
+	 * 
+	 * @param answer - if the table ended up with being solved or not. Another useless solution at this point in time.
 	 * @throws IOException
 	 */
 	public void output(boolean answer) throws IOException {

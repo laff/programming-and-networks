@@ -3,8 +3,9 @@ package INF4130.top_down;
 import INF4130.top_down.SOS;
 
 /**
- * Hello world!
- *
+ * Solution for exercise 1d for Mandatory Assignment 1, INF4130, 2014
+ * 
+ * @author Olafab
  */
 public class App 
 {

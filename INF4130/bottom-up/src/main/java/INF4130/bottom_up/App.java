@@ -3,8 +3,9 @@ package INF4130.bottom_up;
 import INF4130.bottom_up.SOS;
 
 /**
- * Hello world!
+ * Exercise 1b - Mandatory Assignment 1, INF4130, 2014
  *
+ * @author Olafab
  */
 public class App {
     public static void main( String[] args ) {
