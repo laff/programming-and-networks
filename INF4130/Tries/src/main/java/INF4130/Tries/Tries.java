@@ -12,13 +12,15 @@ public class Tries {
     private PrintWriter outputStream;
     private BufferedReader inputStream;
     
-    private String input = "input.txt";//null;
-    private String output = "output.txt";//null;
+    private String input = null;
+    private String output = null;
     
-    
-    public Node root = null;
+    private Node root = null;
     private String charLines[];
+    
     private String characters[];
+    
+    public static String presentStr = "";
     
     public void setInput(String file) {
     	input = file;
@@ -48,49 +50,100 @@ public class Tries {
      */
     public void insert(String line) {
     	
+    	boolean prefix, extension = false;
+    	
     	characters = line.split("");
     	
     	// Temporary node is stored so that Node.addchar() can be called on the proper node.
     	// Node.addchar() either returns a newly created node or a node matching the character sent.
     	Node tmpNode = null;
     	
+    	String tmpChar;
+    	
     	for (int i = 0; i < characters.length; i++) {
     		
     		// Is this character the last character in string?
     		boolean end = (i == characters.length-1);
+
+    		// Store current character to be searched for.
+    		tmpChar = characters[i];
     		
     		// if tmpNode is null, it is the first loop. Else call addchar on the temporary node.
-        	tmpNode = (tmpNode == null) ? root.addChar(characters[i], end) : tmpNode.addChar(characters[i],  end);
+        	tmpNode = (tmpNode == null) ? root.addChar(tmpChar, end) : tmpNode.addChar(tmpChar,  end);
+        	
+        	// check each node if it is has en ending character (while not being the last loop)
+        	if (tmpNode.end && !end) {
+        		extension = true;
+        	}
     	}
+ 
+    	// checking if the last tmpnode had children; determening if prefix or not.
+    	prefix = (!tmpNode.children.isEmpty());
     	
+    	
+    	
+    	/**
+    	 * For each of the inserted strings, output them in a format that represents their status as either PREFIX or EXTENSION.
+    	 * 
+    	 */
     	try {
-    		output();
+    		output(line, prefix, extension, false, false);
     	} catch (IOException ioee) {
     		System.out.println("cant write file");
     	}	
     	
     }
     
-    /**
-     * Function that presents the structure of the tree/strings.
-     */
-    public void presentTrie() {
-    	
-    	/**
-    	 * TODO!
-    	 */
-   
-    }
     
     /**
      * Not implemented.
      * 
      * @param line
      */
-    public void search(String line) {
+    public boolean search(String line) {
     	
-    	System.out.println("searching for: " + line);
+    	String tmpChar;
+    	Node tmpNode = null;
+    	boolean end;
+    	characters = line.split("");
     	
+    	for (int i = 0; i < characters.length; i++) {
+    	
+    		// Is this character the last character in string?
+    		end = (i == characters.length-1);
+    		
+    		// Store current character to be searched for.
+    		tmpChar = characters[i];
+    		
+    		/**
+    		 * Algorithm!!!1111111
+    		 * 
+    		 * Essentially searching for each character amongst the children of tmpNode (searchChar).
+    		 * 
+    		 * The function called returns a Node and stores it to tmpNode.
+    		 * 
+    		 * If the stored node has the wanted character and is marked as an end-node, check if it is supposed to be the ending character (and return true).
+    		 * if it is not the ending character do nothing, and let the search continue.
+    		 * 
+    		 * If the stored node does NOT have the character we are searching for, stop search and return false.
+    		 * 
+    		 */
+    		tmpNode = (tmpNode == null) ? root.searchChar(tmpChar) : tmpNode.searchChar(tmpChar);
+    		
+    		try {
+        		if (tmpNode.character.equals(tmpChar) && tmpNode.end) {
+        			
+        			if (end) {
+        				return true;
+        			}
+        		}
+    		} catch (NullPointerException npe) {
+    			
+    			return false;
+    		}
+    	}
+    	
+    	return false;
     }
     
     /**
@@ -116,43 +169,58 @@ public class Tries {
             int N = 0;
             while ((l = inputStream.readLine()) != null) {
             	
-            	System.out.println(count + " " + N);
-            	
+            	/**
+            	 * Storing first line as amount of string to insert into trie.
+            	 */
             	if (count == 0) {
             		N = Integer.parseInt(l);
             		
             		charLines = new String[N];
-            		
-            	} else if (count < N) {
+            	
+            	/**
+            	 * Storing the next N strings to charLiens array, also inserting them.
+            	 */
+            	} else if (count <= N) {
             		
             		// Storing lines
-            		charLines[count] = l;
+            		charLines[count-1] = l;
             		
             		// inserting lines.
             		insert(l);
             	
-            	} else if (count >= N) {
-            		
-            		System.out.println(count + " " + N);
-            		
-            		search(l);
+            	/**
+            	 * The rest of the strings are to be searched for.
+            	 */
+            	} else if (count > N) {
+            		output(l, false, false, search(l), true);
             	}
+            	
+            	// count up!
             	count++;
             }
+
+            
 
         } finally {
             if (inputStream != null) {
                 inputStream.close();
-                
-                // presenting how characters/strings were inserted!
-                presentTrie();
-                
-
             }
         }
 	}
     
-	public void output() throws IOException {
+	
+	/**
+	 * Overloaded function. Includes alot of funky postfixes to the printed string.
+	 * Functionality regarding printing the string representation is exactly the same as "presentTrie()" but splitted while development.
+	 * 
+	 * @param l
+	 * @param pre
+	 * @param ext
+	 * @param found
+	 * @param searched
+	 * @throws IOException
+	 */
+	public void output(String l, boolean pre, boolean ext, boolean found, boolean searched) throws IOException {
 		
         try {
         	
@@ -160,13 +228,25 @@ public class Tries {
         	boolean add = (outputStream != null);
         	outputStream = new PrintWriter(new BufferedWriter(new FileWriter(output, add)));
         	
+        	// Determines the postfix to our output.
+        	String navlastraing = (pre) ? "PREFIX" : (ext) ? "EXTENSION" : (found) ? "YES" : (searched) ? "NO" : "";
         	
-        	
-        	
-        	//System.out.println();
-        	
-    		//outputStream.print();
-
+        		outputStream.print(l + " " + navlastraing);
+        		
+        		// adding trie presentation if the current line (l) is not searched (added).
+        		if (!searched && !pre && !ext) {
+        			
+        			// cleans global string.
+        			presentStr = "";
+        			
+        			// calls recursive string creator on current root!
+        			root.recurseChars();
+        			
+        			// adds presentation
+        			outputStream.print(presentStr);
+        		}
+        		
+        		outputStream.print("\r\n");
 
         } finally {
             if (outputStream != null) {

@@ -9,9 +9,9 @@ public class App {
     	
     	Tries tries = new Tries();
     	
-    	tries.init();
+    	//tries.init();
     	
-    	/*
+    	
     	// I want two arguments only
     	// name of input file first, then output 
     	int len = args.length;
@@ -22,6 +22,6 @@ public class App {
         	// Initiate program!
         	tries.init();
     	}
-    	*/
+    	
     } 
 }
